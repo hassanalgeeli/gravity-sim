@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>محاكاة قانون الجذب العام</title>
+<style>
+:root{--bg:#f3f6fa;--card:#fff;--ink:#14213d;--mute:#5b6b85;--a:#1d4ed8;--b:#e07a1f;--ok:#177245;--bad:#b42318;--line:#d5dde9;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1624;--card:#18223a;--ink:#e8eefc;--mute:#9db0d0;--a:#6ea0ff;--b:#ffa84d;--ok:#4cd08a;--bad:#ff8a80;--line:#2c3a5a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1624;--card:#18223a;--ink:#e8eefc;--mute:#9db0d0;--a:#6ea0ff;--b:#ffa84d;--ok:#4cd08a;--bad:#ff8a80;--line:#2c3a5a;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Tajawal","Segoe UI",Tahoma,sans-serif;line-height:1.7}
+main{max-width:760px;margin:0 auto;padding:18px}
+h1{font-size:1.5rem;margin:.2em 0}
+p.sub{color:var(--mute);margin:0 0 14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+svg{width:100%;height:auto;display:block}
+.row{display:grid;grid-template-columns:1fr;gap:10px}
+label{display:flex;justify-content:space-between;font-weight:700}
+input[type=range]{width:100%;accent-color:var(--a)}
+.res{font-size:1.3rem;font-weight:700;direction:ltr;text-align:center;padding:10px;border-radius:10px;border:1px dashed var(--line)}
+.fb{padding:10px 12px;border-radius:10px;background:var(--bg);border-right:4px solid var(--a);min-height:3em}
+.q button{font:inherit;margin:4px;padding:8px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+.q button:focus-visible,input:focus-visible{outline:3px solid var(--a);outline-offset:2px}
+.ok{color:var(--ok);font-weight:700}.bad{color:var(--bad);font-weight:700}
+</style>
+</head>
+<body>
+<main>
+<h1>محاكاة قانون الجذب العام لنيوتن</h1>
+<p class="sub">غيّر الكتلتين والمسافة وشاهد قوة الجاذبية تتغير مباشرة.</p>
+
+<div class="card">
+<svg viewBox="0 0 600 140" role="img" aria-label="جسمان وبينهما مسافة">
+<line id="ln" x1="0" y1="70" x2="0" y2="70" stroke="var(--mute)" stroke-width="2" stroke-dasharray="6 5"/>
+<circle id="c1" cx="100" cy="70" r="20" fill="var(--a)"/>
+<circle id="c2" cx="500" cy="70" r="20" fill="var(--b)"/>
+<text id="t1" x="100" y="118" text-anchor="middle" fill="var(--ink)" font-size="15"></text>
+<text id="t2" x="500" y="118" text-anchor="middle" fill="var(--ink)" font-size="15"></text>
+<text id="td" x="300" y="55" text-anchor="middle" fill="var(--ink)" font-size="15"></text>
+</svg>
+</div>
+
+<div class="card row">
+<div><label for="m1"><span>الكتلة الأولى m₁</span><span id="v1"></span></label><input id="m1" type="range" min="1" max="100" value="50"></div>
+<div><label for="m2"><span>الكتلة الثانية m₂</span><span id="v2"></span></label><input id="m2" type="range" min="1" max="100" value="50"></div>
+<div><label for="r"><span>المسافة بينهما r</span><span id="vr"></span></label><input id="r" type="range" min="1" max="10" step="0.5" value="2"></div>
+<div class="res" id="out"></div>
+<div class="fb" id="fb" aria-live="polite"></div>
+</div>
+
+<div class="card q">
+<b>اختبر فهمك:</b> إذا ضاعفت المسافة بين الجسمين، ماذا يحدث لقوة الجاذبية؟
+<div>
+<button data-a="half">تقل إلى النصف</button>
+<button data-a="quarter">تقل إلى الربع</button>
+<button data-a="double">تتضاعف</button>
+</div>
+<div id="qfb" aria-live="polite"></div>
+</div>
+
+<div class="card">
+<b>التفسير العلمي:</b> تنص العلاقة F = G·m₁·m₂ / r² على أن القوة تتناسب طرديًا مع حاصل ضرب الكتلتين، وعكسيًا مع مربع المسافة بينهما. لذلك فإن مضاعفة المسافة تجعل القوة تساوي ¼ قيمتها، ومضاعفة إحدى الكتلتين تضاعف القوة.
+</div>
+</main>
+<script>
+var G=6.674e-11,$=function(i){return document.getElementById(i)};
+var base=null;
+function sci(x){var e=Math.floor(Math.log10(x));return (x/Math.pow(10,e)).toFixed(2)+" × 10^"+e}
+function upd(){
+  var m1=+$("m1").value,m2=+$("m2").value,r=+$("r").value;
+  var F=G*m1*m2/(r*r);
+  $("v1").textContent=m1+" kg";$("v2").textContent=m2+" kg";$("vr").textContent=r+" m";
+  $("c1").setAttribute("r",12+m1*0.18);$("c2").setAttribute("r",12+m2*0.18);
+  var x1=100,x2=100+(r/10)*400;
+  $("c1").setAttribute("cx",x1);$("c2").setAttribute("cx",x2);
+  $("t1").setAttribute("x",x1);$("t2").setAttribute("x",x2);
+  $("t1").textContent=m1+" kg";$("t2").textContent=m2+" kg";
+  $("ln").setAttribute("x1",x1);$("ln").setAttribute("x2",x2);
+  $("td").setAttribute("x",(x1+x2)/2);$("td").textContent="r = "+r+" m";
+  $("out").textContent="F = "+sci(F)+" N";
+  var msg="";
+  if(base){
+    var k=F/base.F,parts=[];
+    if(r!==base.r)parts.push("المسافة تغيرت "+(r/base.r).toFixed(2)+" مرة، فالقوة تتغير بمقدار 1/"+Math.pow(r/base.r,2).toFixed(2)+" وهذا يطابق العلاقة 1/r².");
+    if(m1!==base.m1)parts.push("الكتلة الأولى تغيرت "+(m1/base.m1).toFixed(2)+" مرة، فالقوة تتغير بنفس النسبة.");
+    if(m2!==base.m2)parts.push("الكتلة الثانية تغيرت "+(m2/base.m2).toFixed(2)+" مرة، فالقوة تتغير بنفس النسبة.");
+    msg=parts.length?'<span class="ok">النتيجة صحيحة ✔</span> '+parts.join(" ")+" القوة الآن = "+k.toFixed(3)+" × القوة الابتدائية.":"";
+  }
+  $("fb").innerHTML=msg||"حرّك أحد المنزلقات لتظهر لك التغذية الراجعة.";
+}
+["m1","m2","r"].forEach(function(i){$(i).addEventListener("input",upd)});
+var m1=+$("m1").value,m2=+$("m2").value,r=+$("r").value;
+base={m1:m1,m2:m2,r:r,F:G*m1*m2/(r*r)};
+upd();
+document.querySelectorAll(".q button").forEach(function(b){b.addEventListener("click",function(){
+  var ok=b.dataset.a==="quarter";
+  $("qfb").innerHTML=ok?'<p class="ok">إجابة صحيحة ✔ لأن القوة تتناسب عكسيًا مع r²، و2² = 4 فتصبح القوة الربع.</p>':'<p class="bad">إجابة غير صحيحة ✘ القوة تتناسب مع 1/r²، فعند مضاعفة المسافة تصبح الربع. جرّب منزلق المسافة وتحقق بنفسك.</p>';
+})});
+</script>
+</body>
+</html>
